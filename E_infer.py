@@ -3,6 +3,12 @@ import random
 import json
 import numpy as np
 import torch
+# import gc
+# gc.collect()
+# torch.cuda.empty_cache()
+# print("#################################")
+# torch.cuda.memory_summary(device=None, abbreviated=False)
+# print("#################################")
 import argparse
 from torch.utils.data import DataLoader
 
@@ -47,7 +53,7 @@ def main(args):
     hypara['E']['E_shapenet4096'] = args.E_shapenet4096
 
     # Create Dataset
-    batch_size = 32
+    batch_size = 16 #32
     if args.infer_test:
         cur_dataset = shapenet4096('test', hypara['E']['E_shapenet4096'], hypara['D']['D_datatype'], True)
         cur_dataloader = DataLoader(cur_dataset, 
@@ -77,25 +83,31 @@ def infer(args, cur_dataloader, Network, hypara, train_val_test, batch_size, col
             outdict = Network(pc = points)
 
             vertices, faces = utils_pt.generate_cube_mesh_batch(outdict['verts_forward'], outdict['cube_face'], batch_size)
-            utils_pt.visualize_segmentation(points, color, outdict['assign_matrix'], save_path, _, names)
+            # utils_pt.visualize_segmentation(points, color, outdict['assign_matrix'], save_path, _, names)
             utils_pt.visualize_cubes(vertices, faces, color, save_path, _, '', names)
-            utils_pt.visualize_cubes_masked(vertices, faces, color, outdict['assign_matrix'], save_path, _, '', names)
+            # utils_pt.visualize_cubes_masked(vertices, faces, color, outdict['assign_matrix'], save_path, _, '', names)
             vertices_pred, faces_pred = utils_pt.generate_cube_mesh_batch(outdict['verts_predict'], outdict['cube_face'], batch_size)
             utils_pt.visualize_cubes(vertices_pred, faces_pred, color, save_path, _, 'pred', names)
-            utils_pt.visualize_cubes_masked(vertices_pred, faces_pred, color, outdict['assign_matrix'], save_path, _, 'pred', names)
-            utils_pt.visualize_cubes_masked_pred(vertices_pred, faces_pred, color, outdict['exist'], save_path, _, names)
+            # utils_pt.visualize_cubes_masked(vertices_pred, faces_pred, color, outdict['assign_matrix'], save_path, _, 'pred', names)
+            # utils_pt.visualize_cubes_masked_pred(vertices_pred, faces_pred, color, outdict['exist'], save_path, _, names)
             print(j)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument ('--E_CUDA', default = 0, type = int, help = 'Index of CUDA')
-    parser.add_argument ('--infer_train', default = True, type = bool, help = 'If infer training set')
+    # parser.add_argument ('--infer_train', default = True, type = bool, help = 'If infer training set')
+    parser.add_argument ('--infer_train', default = False, type = bool, help = 'If infer training set')
     parser.add_argument ('--infer_test', default = True, type = bool, help = 'If infer test set')
     
-    parser.add_argument ('--E_shapenet4096', default = '', type = str, help = 'Path to ShapeNet4096 dataset')
-    parser.add_argument ('--E_ckpt_path', default = '', type = str, help = 'Experiment checkpoint path')
-    parser.add_argument ('--checkpoint', default = '', type = str, help = 'Checkpoint name')
+    
+    parser.add_argument ('--E_shapenet4096', default = '/home/harshit/meta/CuboidAbstractionViaSeg/ShapeNetNormal4096/', type = str, help = 'Path to ShapeNet4096 dataset')
+    parser.add_argument ('--E_ckpt_path', default = '/home/harshit/meta/CuboidAbstractionViaSeg/PretrainModels/airplane', type = str, help = 'Experiment checkpoint path')
+    parser.add_argument ('--checkpoint', default = 'airplane.pth', type = str, help = 'Checkpoint name')
 
     args = parser.parse_args()
     main(args)
+
+'''
+python E_infer.py --E_shapenet4096 /home/harshit/meta/CuboidAbstractionViaSeg/ShapeNetNormal4096/ --E_ckpt_path /home/harshit/meta/CuboidAbstractionViaSeg/PretrainModels/airplane --checkpoint airplane.pth
+'''

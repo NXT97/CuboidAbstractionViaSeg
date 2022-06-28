@@ -3,12 +3,6 @@ import random
 import json
 import numpy as np
 import torch
-# import gc
-# gc.collect()
-# torch.cuda.empty_cache()
-# print("#################################")
-# torch.cuda.memory_summary(device=None, abbreviated=False)
-# print("#################################")
 import argparse
 from torch.utils.data import DataLoader
 

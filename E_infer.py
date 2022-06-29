@@ -47,7 +47,7 @@ def main(args):
     hypara['E']['E_shapenet4096'] = args.E_shapenet4096
 
     # Create Dataset
-    batch_size = 16 #32
+    batch_size = 20 #32
     if args.infer_test:
         cur_dataset = shapenet4096('test', hypara['E']['E_shapenet4096'], hypara['D']['D_datatype'], True)
         cur_dataloader = DataLoader(cur_dataset, 
